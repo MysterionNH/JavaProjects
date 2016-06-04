@@ -2,7 +2,11 @@ package com.mysterionnh.tinker.golsim;
 
 import java.util.Random;
 
+import com.mysterionnh.util.Logger;
+
 public class GameOfLife {
+  
+  Logger log;
   
   private String deadSign = ". ";
   private String aliveSign = "O ";
@@ -13,8 +17,8 @@ public class GameOfLife {
    *              arg2 - int, genCount
    *              arg3 - int, sleepTime in millis
    */
-  public static void main(String[] args) {
-    GameOfLife gol = new GameOfLife();
+  public GameOfLife(Logger _log, String[] args) {
+    log = _log;
     
     // Defaults
     int fieldSize = 50;
@@ -23,26 +27,24 @@ public class GameOfLife {
     int sleepTime = 500;
     int temp;
     
-    if (args != null & args.length == 4) {
+    if (args != null & args.length == 5) {
       try {
-        temp = Integer.valueOf(args[0]);
+        temp = Integer.valueOf(args[1]);
         fieldSize = (temp > 0) ? temp: fieldSize;
         
-        temp = Integer.valueOf(args[1]);
+        temp = Integer.valueOf(args[2]);
         maxStartCellCount = (temp > 0 && temp < (fieldSize*fieldSize)) ? temp : maxStartCellCount;
 
-        temp = Integer.valueOf(args[2]);
+        temp = Integer.valueOf(args[3]);
         generationCount = (temp >= 0) ? temp : generationCount;
         
-        temp = Integer.valueOf(args[3]);
+        temp = Integer.valueOf(args[4]);
         sleepTime = (temp >= 0) ? temp : sleepTime;
       } catch (NumberFormatException e) {
-        gol.logMsg("\n\nInvalid argument type used! Valid arguments are *fieldsize* *maxStartCellCount* *generationCount* *waitTimeInMillisBetweenGenerations*, all of them as Integers.\n\n", true);
-        e.printStackTrace();
-        System.exit(-1);
+        log.logError(this, "\n\nInvalid argument type used! Valid arguments are *fieldsize* *maxStartCellCount* *generationCount* *waitTimeInMillisBetweenGenerations*, all of them as Integers.\n\n", true, e);
       }
     }
-    gol.simulateGameOfLife(fieldSize, maxStartCellCount, generationCount, sleepTime);
+    simulateGameOfLife(fieldSize, maxStartCellCount, generationCount, sleepTime);
   }
 
   public void simulateGameOfLife(int fieldSize, int maxStartCellCount, int generationCount, int sleepTime) {
@@ -84,9 +86,9 @@ public class GameOfLife {
     */
     
     for (int b = 0; b < fieldSize; b++) {
-      logMsg("\n", false);
+      log.logString("\n");
       for (int c = 0; c < fieldSize; c++) {
-        logMsg(currentGeneration[b][c] ? aliveSign : deadSign, false);
+        log.logString(currentGeneration[b][c] ? aliveSign : deadSign);
         if (currentGeneration[b][c]) {
           alive++;
         } else {
@@ -95,13 +97,13 @@ public class GameOfLife {
       }
     }
     
-    logMsg("\n\nGeneration 0 - " + alive + " alive and " + dead + " dead cells\n", false);
+    log.logString("\n\nGeneration 0 - " + alive + " alive and " + dead + " dead cells\n");
     
     for (int gens = 0; gens < generationCount; gens++) {
       dead = 0;
       alive = 0;
       for (int i = 0; i < fieldSize; i++) {
-        logMsg("\n", false);
+        log.logString("\n");
         for (int j = 0; j < fieldSize; j++) {
           for (int k = -1; k < 2; k++) {
             for (int l = -1; l < 2; l++) {
@@ -127,19 +129,18 @@ public class GameOfLife {
               dead++;
             }
           }
-          logMsg(nextGeneration[i][j] ? aliveSign : deadSign, false);
+          log.logString(nextGeneration[i][j] ? aliveSign : deadSign);
           aliveCount = 0;
         }
       }
-      logMsg("\n\nGeneration " + (gens + 1) + " - " + alive + " alive and " + dead + " dead cells\n", false);
+      log.logString("\n\nGeneration " + (gens + 1) + " - " + alive + " alive and " + dead + " dead cells\n");
       
       // every 5 generations we take a look whether the simulation died
       if (!((gens + 1) % 5 == 0 && gens != 0)) {
         currentGeneration = nextGeneration;
         wait(sleepTime);
       } else if (generationIsDead(currentGeneration)) {
-        logMsg("\n\nIndifferent Generations - Terminating Simulation\n", true);
-        System.exit(-1);
+        log.logError(this, "\n\nIndifferent Generations - Terminating Simulation\n", true);
       } else {
         currentGeneration = nextGeneration;
         wait(sleepTime);
@@ -159,7 +160,7 @@ public class GameOfLife {
             return ((modus == 1) ? ((num == (fieldSize - 1)) ? 0 : (num + 1)) : ((num == 0) ? (fieldSize - 1) : (num - 1)));
           }
     } else {
-      logMsg("Invalid modus! (generateValidCoordinate(int, int))", true);
+      log.logError(this, "Invalid modus! (generateValidCoordinate(int, int))", true);
       return -1;
     }
   }
@@ -177,14 +178,6 @@ public class GameOfLife {
       }
     }
     return dead;
-  }
-  
-  private void logMsg(String msg, boolean error) {
-    if (error) {
-      System.err.print(msg);
-    } else {
-      System.out.print(msg);
-    }
   }
   
   private void wait(int millis) {

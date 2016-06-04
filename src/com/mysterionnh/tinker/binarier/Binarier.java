@@ -1,17 +1,23 @@
 package com.mysterionnh.tinker.binarier;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import com.mysterionnh.util.Logger;
+
 public class Binarier {
+  
+  private Logger log;
   
   private int divider = 8;
   private boolean hex = false;
   
-  public Binarier() {
-    
+  public Binarier(Logger _log, String[] args) {
+    this.log = _log;
+    setDivider(Integer.valueOf(args[2]));
+    setEncoding(args[3]);
+    printBytes(args[1]);
   }
   
   public void setDivider(int div) {
@@ -22,10 +28,15 @@ public class Binarier {
     hex = str.equalsIgnoreCase("hex");
   }
   
-  public void printBytes(String pathStr) throws IOException {
+  public void printBytes(String pathStr) {
     int count = 0;
     Path path = Paths.get(pathStr);
-    byte[] data = Files.readAllBytes(path);
+    byte[] data = null;
+    try {
+      data = Files.readAllBytes(path);
+    } catch (Exception e) {
+      log.logError(this, "No file at given path!", true, e);
+    }
     for (byte b : data) {
       count++;
       

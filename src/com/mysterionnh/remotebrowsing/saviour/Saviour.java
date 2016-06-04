@@ -2,7 +2,6 @@ package com.mysterionnh.remotebrowsing.saviour;
 
 import java.awt.image.RenderedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -16,16 +15,22 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
+import com.mysterionnh.Constants;
+import com.mysterionnh.util.Logger;
+
 public class Saviour {
+  
+  Logger log;
 
-  public static void main(String[] args) throws FileNotFoundException, IOException {    
-    System.setProperty("webdriver.chrome.driver", "E:\\Niklas\\My Stuff\\PC Files\\Desktop\\RemoteBrowsing\\chromedriver.exe");
-
+  public Saviour(Logger _log, String[] args) {
+    log = _log;
+    
+    System.setProperty("webdriver.chrome.driver", Constants.CHROME_DRIVER_PATH);
     WebDriver driver = new ChromeDriver();
     
-    driver.get("E:\\Niklas\\My Stuff\\PC Files\\Desktop\\pica\\h29.html");
+    driver.get(args[1]);
     
-    String path = "E:\\Niklas\\My Stuff\\PC Files\\Desktop\\pica\\" + (driver.findElement(By.tagName("font")).getText());
+    String path = args[2] + driver.getTitle();
     File f = new File(path);
     f.mkdir();
     System.out.println(f.getAbsolutePath());

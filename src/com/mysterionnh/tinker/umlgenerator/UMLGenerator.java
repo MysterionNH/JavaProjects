@@ -7,32 +7,34 @@ import java.util.ArrayList;
 import com.mysterionnh.util.Logger;
 
 public class UMLGenerator {
-  private static final String LOG_PATH = "..\\latest.log";
-  private static final String defaultFilePath = "..\\source.java";
-  private static final String defaultFolderPath = "..\\soureFolder";
+  private Logger log;
   
-  private static ArrayList<File> files = new ArrayList<File>();
+  private final String defaultFilePath = "..\\source.java";
+  private final String defaultFolderPath = "..\\soureFolder";
+  
+  private ArrayList<File> files = new ArrayList<File>();
 
-  public static void main(String[] args) throws IOException {
-    Logger log = new Logger(LOG_PATH);
-    log.startLogging(true);
-    if (args.length == 1) {
-      if (args[0].equals("-folder")) {
-        buildFromFolder(defaultFolderPath, log);
-      } else if (args[0].equals("-file")) {
-        buildFromFile(defaultFilePath, log, 0);
-      } else {
-        log.logString("Unknowm argument: \"" + args[0] + "\". Available arguments are \"-file\" and \"-folder\""); //$NON-NLS-2$
-        System.exit(-1);
+  public UMLGenerator(Logger _log, String[] args) {
+    log = _log;
+    if (args.length == 2) {
+      try {
+        if (args[1].equals("-folder")) {
+          buildFromFolder(defaultFolderPath, log);
+        } else if (args[1].equals("-file")) {
+          buildFromFile(defaultFilePath, log, 0);
+        } else {
+          log.logString("Unknowm argument: \"" + args[1] + "\". Available arguments are \"-file\" and \"-folder\"");
+          System.exit(-1);
+        }
+      } catch (IOException e) {
+        log.logError(this, "No such file!", true, e);
       }
     } else {
-      log.logError("Too many or no argumets! Try either \"-file\" or \"-folder\"");
-      System.exit(-1);
+      log.logError(this, "Too many or no argumets! Try either \"-file\" or \"-folder\"", true);
     }
-    log.stopLogging(true);
   }
   
-  public static void buildFromFolder(String path, Logger log) throws IOException {
+  public void buildFromFolder(String path, Logger log) throws IOException {
     int fileNum = 0;
     File folder = new File(path);
     if (!folder.exists()) {
@@ -56,7 +58,7 @@ public class UMLGenerator {
     }
   }
   
-  public static void buildFromFile(String path, Logger log, int fileNum) throws IOException {
+  public void buildFromFile(String path, Logger log, int fileNum) throws IOException {
     FileParser parser = new FileParser(log, fileNum);
     parser.parseFile(path);
     UMLBuilder builder = new UMLBuilder(log);
@@ -71,7 +73,7 @@ public class UMLGenerator {
     *        reg:        what should be counted
     * @return            returns Occurrences of reg in original or -1 if reg or str where empty
     *
-   private static int countOccurrencesOf(String str, String reg) {
+   private int countOccurrencesOf(String str, String reg) {
      if (!str.isEmpty() || !reg.isEmpty()) {
        return str.length() - str.replace(reg, "").length();
      } else {

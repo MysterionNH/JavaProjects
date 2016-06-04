@@ -299,7 +299,7 @@ public class FileParser {
         return'~';
       }
       default: {
-        log.logError("Whoops, you sure your file is alright? (One " + ((method) ? "method" : "atribute") + " has a weird type, line: " + line + ")");
+        log.logError(this, "Whoops, you sure your file is alright? (One " + ((method) ? "method" : "atribute") + " has a weird type, line: " + line + ")", true);
         return ' ';
       }
     }

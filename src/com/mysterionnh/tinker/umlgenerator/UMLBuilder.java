@@ -1,33 +1,23 @@
 package com.mysterionnh.tinker.umlgenerator;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
-import com.mysterionnh.util.Logger;
+import com.mysterionnh.*;
+import com.mysterionnh.util.*;
 
 public class UMLBuilder {
-  private Logger log;
+  //private Logger log;
   
-  private final int LETTER_LENGTH = 12;
-  private final int LETTER_HEIGTH = 20;
-  private final String RESOURCE_PATH = "com.mysterionnh.umlgenerator.strings";
+  //private final int LETTER_LENGTH = 12;
+  //private final int LETTER_HEIGTH = 20;
   
-  private final String GRAPH_TEMPLATE = getStringFromResource(RESOURCE_PATH, "DraftAndImplementaionDiagrammBuilder.graphTemplate");
-  private final String NODE_TEMPLATE = getStringFromResource(RESOURCE_PATH, "DraftAndImplementaionDiagrammBuilder.nodeTemplate");
-  private final String ARROW_TEMPLATE = getStringFromResource(RESOURCE_PATH, "DraftAndImplementaionDiagrammBuilder.arrowTemplate");
+  //private final String GRAPH_TEMPLATE = R.getResource(Constants.STRING_RESOURCE_PATH, "umlgenerator.graphTemplate");
+  private final String NODE_TEMPLATE  = R.getResource(Constants.STRING_RESOURCE_PATH, "umlgenerator.nodeTemplate");
+  //private final String ARROW_TEMPLATE = R.getResource(Constants.STRING_RESOURCE_PATH, "umlgenerator.arrowTemplate");
   
   public UMLBuilder(Logger logger) {
-    log = logger;
+    //log = logger;
   }
   
   public void createNodes(FileParser parser, int num) throws IOException {
@@ -109,15 +99,6 @@ public class UMLBuilder {
       while ((length = in.read(buf)) > 0) {
         out.write(buf, 0, length);
       }
-    }
-  }
-
-  public String getStringFromResource(String resPath, String key) {
-    ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(resPath);
-    try {
-      return RESOURCE_BUNDLE.getString(key);
-    } catch (MissingResourceException e) {
-      return '!' + key + '!';
     }
   }
 }

@@ -3,20 +3,14 @@ package com.mysterionnh.remotebrowsing.aie;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -24,21 +18,24 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import com.mysterionnh.Constants;
+import com.mysterionnh.util.Logger;
+
 public class AutoImageEnlarger {
+  
+  Logger log;
   
   private ArrayList<File> files = new ArrayList<File>();
   private long startTime;
   private int imageCount = 0, folderCount = 1;
 
-  public static void main(String[] args) throws Exception {
-    
-    AutoImageEnlarger aie = new AutoImageEnlarger();
-    
-    aie.enlarge(args[0], Integer.parseInt(args[1]), args[2]);
+  public AutoImageEnlarger(Logger _log, String[] args) {
+    log = _log;
+    enlarge(args[1], Integer.parseInt(args[2]));
   }
   
-  private void enlarge(String path, int denoiseLvl, String chromeDriverPath) throws Exception {
-    System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+  private void enlarge(String path, int denoiseLvl) {
+    System.setProperty("webdriver.chrome.driver", Constants.CHROME_DRIVER_PATH);
     
     ChromeOptions options = new ChromeOptions();
     List<String> chromeArguments = new ArrayList<String>();
@@ -51,7 +48,11 @@ public class AutoImageEnlarger {
     
     String site = "http://waifu2x.booru.pics";
     
-    getFiles(path);
+    try {
+      getFiles(path);
+    } catch (IOException e) {
+      log.logError(this, "Unable to acces Image!", true, e);
+    }
     
     startTime = System.currentTimeMillis();
     
@@ -59,7 +60,12 @@ public class AutoImageEnlarger {
       if (image.getAbsolutePath().endsWith("png") || image.getAbsolutePath().endsWith("jpg")) {
         System.out.println("Testing \"" + image.getAbsolutePath() + "\"...");
         // test whether image is already larger than max supported size
-        BufferedImage bimg = ImageIO.read(image);
+        BufferedImage bimg = null;
+        try {
+          bimg = ImageIO.read(image);
+        } catch (IOException e) {
+          log.logError(this, "Unable to acces Image!", true, e);
+        }
         int width          = bimg.getWidth();
         int height         = bimg.getHeight();
         
@@ -69,7 +75,7 @@ public class AutoImageEnlarger {
           driver.get(site);
           
           // test whether this file was already uploaded, if yes, saves a ton of time
-          //driver.get("http://waifu2x.booru.pics/Home/show?hash=" + calcSHA1(image) + "_s2_n1");
+          //driver.get("http://waifu2x.booru.pics/Home/show?hash=" + IO.calcSHA1(image) + "_s2_n1");
           
           if (!driver.getPageSource().contains("PNG")) {
             driver.get(site);
@@ -92,9 +98,17 @@ public class AutoImageEnlarger {
               while (!progressBar.getAttribute("aria-valuenow").equals("1")) {
                 // still waiting
                 System.out.println("Waiting for upload to finish...");
-                Thread.sleep(5000); // do not throttle the connection
+                try {
+                  Thread.sleep(5000); // do not throttle the connection
+                } catch (InterruptedException e) {
+                  log.logError(this, "", true, e);
+                }
               }
-              Thread.sleep(1000); // annoying transition, if we hit in it, the image won't be downloaded
+              try {
+                Thread.sleep(1000); // annoying transition, if we hit in it, the image won't be downloaded
+              } catch (InterruptedException e) {
+                log.logError(this, "", true, e);
+              }
               recieveNewImage(driver, image);
             } else {
               System.err.println("Already big enough...\n");
@@ -125,24 +139,6 @@ public class AutoImageEnlarger {
         folderCount++;
         getFiles(f.getAbsolutePath());
       }
-    }
-  }
-  
-  private String calcSHA1(File file) throws FileNotFoundException, IOException, NoSuchAlgorithmException {
-
-    MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
-    
-    try (InputStream input = new FileInputStream(file)) {
-
-      byte[] buffer = new byte[8192];
-      int len = input.read(buffer);
-    
-      while (len != -1) {
-          sha1.update(buffer, 0, len);
-          len = input.read(buffer);
-      }
-
-      return (new HexBinaryAdapter().marshal(sha1.digest())).toLowerCase();
     }
   }
   

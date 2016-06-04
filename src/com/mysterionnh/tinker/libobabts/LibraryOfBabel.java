@@ -3,8 +3,6 @@ package com.mysterionnh.tinker.libobabts;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +11,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+
+import com.mysterionnh.util.Logger;
 
 public class LibraryOfBabel {
   private String[][] replacements = { {"\\", ".bs."},
@@ -63,17 +63,19 @@ public class LibraryOfBabel {
                                       {"9", ".ni."}
                                       //{".", ",,dot,,"} // preventing corruption/hijacking
                                     };
+  private Logger log;
   private WebDriver driver;
-  private PrintWriter writer;
 
-  public static void main(String[] args) throws IOException {
+  public LibraryOfBabel(Logger _log, String[] args) {
+    log = _log;
+    
     boolean fetch = false;
     
     boolean error = false;
     String errorMsg = "";
 
     // verify arguments
-    if (args.length > 0 && args[0] != null && args[1] != null) {
+    if (args.length > 0 && args[1] != null && args[2] != null) {
       if (args[1].equals("--d") || args[1].equals("--f")) {
         fetch = (args[1].equals("--f"));
       } else {
@@ -92,18 +94,15 @@ public class LibraryOfBabel {
       System.exit(1);
     }
 
-    LibraryOfBabel lob = new LibraryOfBabel();
-
-    lob.iniDriver();
-    lob.writer = new PrintWriter(args[0], "UTF-8");
+    iniDriver();
 
     if (fetch) {
-      lob.fetch(lob.getAddressFromFile(args[0]), args[0]);
+      fetch(getAddressFromFile(args[1]), args[2]);
     } else {
-      lob.deploy(lob.getTextFromFile(args[0]), args[0]);
+      deploy(getTextFromFile(args[1]), args[2]);
     }
     
-    lob.driver.close();
+    driver.close();
   }
   
   private void iniDriver() {
@@ -136,16 +135,16 @@ public class LibraryOfBabel {
     return address;
   }
   
-  private void fetch(String address, String filePath) throws IOException {
+  private void fetch(String address, String filePath) {
     driver.get("https://libraryofbabel.info/book.cgi?" + address);
     
     WebElement text = driver.findElement(By.id("textblock"));
     
     for (String s : (text.getText()).replaceAll("\n", "").split(".nl.")) {
-      writer.append("\n" + decodeString(s));
+      log.getWriter().append("\n" + decodeString(s));
     }
-    
-    writer.close();
+    log.getWriter().flush();
+    // May (read: most likely) doesn't work, I just changed it to somehow be like it was before.. needs testing //TODO
   }
   
   private String getTextFromFile(String path) {
@@ -167,7 +166,7 @@ public class LibraryOfBabel {
     return text;
   }
   
-  private void deploy(String text, String filePath) throws IOException {
+  private void deploy(String text, String filePath) {
     driver.get("https://libraryofbabel.info/search.html");
 
     WebElement searchBox = driver.findElement(By.name("find"));
@@ -178,10 +177,9 @@ public class LibraryOfBabel {
     List<WebElement> page = driver.findElements(By.tagName("b"));
     String[] parts = match.getText().split("w");
     
-    PrintWriter writer = new PrintWriter(filePath, "UTF-8");
-    
-    writer.append(match.getAttribute("onclick").split("'")[1] + "-w" + parts[parts.length - 1] + ":" + Integer.parseInt(page.get(1).getText()));
-    writer.close();
+    log.getWriter().append(match.getAttribute("onclick").split("'")[1] + "-w" + parts[parts.length - 1] + ":" + Integer.parseInt(page.get(1).getText()));
+    log.getWriter().flush();
+    // May (read: most likely) doesn't work, I just changed it to somehow be like it was before.. needs testing //TODO
   }
   
   private String encodeString(String str) {
