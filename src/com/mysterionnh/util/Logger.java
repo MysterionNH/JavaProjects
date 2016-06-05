@@ -56,9 +56,14 @@ public class Logger {
     writer.write(showTimeStamp ? "Started logging at " + formatTime(dateFormat, startTime) + "\n\n" : "");
   }
   
-  public void logString(String msg) {
-    System.out.print(msg);
-    writer.print(msg);
+  public void logString(Object o) {
+    System.out.print(String.valueOf(o));
+    writer.print(String.valueOf(o));
+  }
+  
+  public void logString(String msg, Object[] o) {
+    System.out.print(String.format(msg, o));
+    writer.print(String.format(msg, o));
   }
   
   public void logError(Object context, String msg, boolean fatal) {

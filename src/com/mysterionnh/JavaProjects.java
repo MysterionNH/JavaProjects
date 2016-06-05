@@ -4,16 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import com.mysterionnh.remotebrowsing.aie.AutoImageEnlarger;
-import com.mysterionnh.remotebrowsing.rc.RemoteChrome;
-import com.mysterionnh.remotebrowsing.saviour.Saviour;
-import com.mysterionnh.tinker.binarier.Binarier;
-import com.mysterionnh.tinker.golsim.GameOfLife;
-import com.mysterionnh.tinker.libobabts.LibraryOfBabel;
-import com.mysterionnh.tinker.primegen.Primes;
-import com.mysterionnh.tinker.umlgenerator.UMLGenerator;
-import com.mysterionnh.util.Logger;
 import com.mysterionnh.util.R;
+import com.mysterionnh.util.Logger;
+
+import com.mysterionnh.tinker.Primes;
+import com.mysterionnh.tinker.Binarier;
+import com.mysterionnh.tinker.GameOfLife;
+import com.mysterionnh.tinker.LibraryOfBabel;
+import com.mysterionnh.tinker.umlgenerator.UMLGenerator;
+
+import com.mysterionnh.remotebrowsing.Saviour;
+import com.mysterionnh.remotebrowsing.RemoteChrome;
+import com.mysterionnh.remotebrowsing.AutoImageEnlarger;
 
 public class JavaProjects {
 
@@ -53,65 +55,68 @@ public class JavaProjects {
       if (!args[1].isEmpty()) {
         log.logString(String.format("\n%s\n", R.getResource(Constants.STRING_RESOURCE_PATH, String.format("main_%s_help", modules.get((modules.indexOf(args[1]) != -1) ? modules.indexOf(args[1]) : 0)))));
       } else {
-        log.logString(String.format("\n%s\n", R.getResource(Constants.STRING_RESOURCE_PATH, "main_general_help")));
+        log.logString(buildHelpText());
       }
-      inputPromt();
     } else if (modules.contains(args[0])) {
-      switch (modules.indexOf(args[0])) {
-        case 1:
-        {
-          new AutoImageEnlarger(log, args);
-          return;
-        }
-        case 2:
-        {
-          new RemoteChrome(log, args);
-          return;
-        }
-        case 3:
-        {
-          new Saviour(log, args);
-          return;
-        }
-        case 4:
-        {
-          new Binarier(log, args);
-          return;
-        }
-        case 5:
-        {
-          new GameOfLife(log, args);
-          return;
-        }
-        case 6:
-        {
-          new LibraryOfBabel(log, args);
-          return;
-        }
-        case 7:
-        {
-          new Primes(log, args);
-          return;
-        }
-        case 8:
-        {
-          new UMLGenerator(log, args);
-          return;
-        }
-        default:
-        {
-          // This should never happen.
-          log.logError(this, "\nDon't even ask", true);
+      if (helpCommands.contains(args[1]) && args[2].isEmpty()) {
+        log.logString(String.format("\n%s\n", R.getResource(Constants.STRING_RESOURCE_PATH, String.format("main_%s_help_ext", modules.indexOf(args[1])))));
+      } else {
+        switch (modules.indexOf(args[0])) {
+          case 1:
+          {
+            new AutoImageEnlarger(log, args);
+            break;
+          }
+          case 2:
+          {
+            new RemoteChrome(log, args);
+            break;
+          }
+          case 3:
+          {
+            new Saviour(log, args);
+            break;
+          }
+          case 4:
+          {
+            new Binarier(log, args);
+            break;
+          }
+          case 5:
+          {
+            new GameOfLife(log, args);
+            break;
+          }
+          case 6:
+          {
+            new LibraryOfBabel(log, args);
+            break;
+          }
+          case 7:
+          {
+            new Primes(log, args);
+            break;
+          }
+          case 8:
+          {
+            new UMLGenerator(log, args);
+            break;
+          }
+          default:
+          {
+            // This should never happen.
+            log.logError(this, "\nDon't even ask", true);
+          }
         }
       }
-    } else if (args[0].isEmpty()){
-      inputPromt();
-    } else if (args[0] == "exit"){
+    } else if (args[0].isEmpty()) {
+      // do nothin'
+    } else if (args[0].equals("exit")) {
       return;
     } else if (args[0] == "gui") {
       log.logString("Not yet buddy, sorry :(");
-      inputPromt();
     }
+    inputPromt();
   }
   
   private static void iniLists() {
@@ -134,5 +139,11 @@ public class JavaProjects {
   private void inputPromt() {
     log.logString("\n> ");
     handleInput(scanner.nextLine().split(" "));
+  }
+  
+  private String buildHelpText() {
+    StringBuilder b = new StringBuilder();
+    b.append(String.format("\n%s\n", R.getResource(Constants.STRING_RESOURCE_PATH, "main_general_help")));
+    return String.format("\n%s\n", R.getResource(Constants.STRING_RESOURCE_PATH, "main_general_help"));
   }
 }

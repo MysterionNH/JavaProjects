@@ -1,4 +1,4 @@
-package com.mysterionnh.tinker.binarier;
+package com.mysterionnh.tinker;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

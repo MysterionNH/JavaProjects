@@ -1,4 +1,4 @@
-package com.mysterionnh.tinker.libobabts;
+package com.mysterionnh.tinker;
 
 import java.io.BufferedReader;
 import java.io.File;

@@ -1,4 +1,4 @@
-package com.mysterionnh.tinker.primegen;
+package com.mysterionnh.tinker;
 
 import com.mysterionnh.util.Logger;
 

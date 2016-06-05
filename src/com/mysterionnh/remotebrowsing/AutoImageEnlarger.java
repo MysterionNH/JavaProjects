@@ -1,4 +1,4 @@
-package com.mysterionnh.remotebrowsing.aie;
+package com.mysterionnh.remotebrowsing;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;

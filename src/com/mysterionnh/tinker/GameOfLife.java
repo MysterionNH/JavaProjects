@@ -1,4 +1,4 @@
-package com.mysterionnh.tinker.golsim;
+package com.mysterionnh.tinker;
 
 import java.util.Random;
 

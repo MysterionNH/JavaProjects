@@ -1,4 +1,4 @@
-package com.mysterionnh.remotebrowsing.rc;
+package com.mysterionnh.remotebrowsing;
 
 import java.util.ArrayList;
 import java.util.List;
