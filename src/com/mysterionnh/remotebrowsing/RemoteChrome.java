@@ -19,6 +19,7 @@ public class RemoteChrome {
     //log = _log;
     iniDriver();
     driver.get(args[1]);
+    if (Boolean.valueOf(args[2])) System.exit(0);;
   }
   
   private void iniDriver() {

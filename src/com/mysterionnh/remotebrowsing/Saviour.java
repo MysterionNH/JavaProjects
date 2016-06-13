@@ -29,7 +29,7 @@ public class Saviour {
     
     driver.get(args[1]);
     
-    String path = args[2] + "_" + driver.getTitle();
+    String path = args[2];// + "_" + driver.getTitle();
     File f = new File(path);
     f.mkdir();
     Object o[] = {f.getAbsolutePath()};
@@ -46,12 +46,12 @@ public class Saviour {
                 
         ImageIO.write((RenderedImage)ImageIO.read(urlConnection.getInputStream()), "png", fos);
         fos.close();
-        log.logString(String.valueOf(i));
+        log.logString("\n" + String.valueOf(i));
       } catch (Exception e) {
-        log.logError(this, "Error", false, e);
+        log.logError(this, "Error", false);
       }
     }
     //driver.close();
-    System.out.println("Done.");
+    System.out.println("\nDone.");
   }
 }

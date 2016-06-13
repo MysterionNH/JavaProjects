@@ -1,6 +1,5 @@
 package com.mysterionnh.util;
 
-/*
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -9,11 +8,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
-*/
 
 public class IO {
-/*
-  private static String calcSHA1(File file) {
+
+  public static String calcSHA1(File file) {
 
     MessageDigest sha1 = null;
     try {
@@ -40,5 +38,4 @@ public class IO {
       return "";
     }
   }
-*/
 }
