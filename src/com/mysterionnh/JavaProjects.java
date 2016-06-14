@@ -74,7 +74,9 @@ public class JavaProjects {
           }
           case 3:
           {
-            new Saviour(log, args);
+            if (args.length == Saviour.ARGS + 1) {
+              new Saviour(log, args);
+            }
             break;
           }
           case 4:

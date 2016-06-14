@@ -9,8 +9,7 @@ import java.util.Arrays;
  * @author Niklas Halle
  * @version 1.0
  */
-public class InputDialog
-{
+public class InputDialog {
     String _name = null;
     String _age = null;
     String _complete = "0";

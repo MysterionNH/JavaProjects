@@ -19,6 +19,8 @@ import com.mysterionnh.util.Logger;
 
 public class Saviour {
   
+  public static final int ARGS = 3;
+  
   Logger log;
 
   public Saviour(Logger _log, String[] args) {
