@@ -78,11 +78,10 @@ public class Logger {
   
   public void logError(Object context, String msg, boolean fatal, Exception ex) {
     System.err.printf("\nERROR in %s: %s\n", getContext(context), msg);
-    writer.println(msg);
-    writer.println("\t\t --ERROR--");
+    writer.println(String.format("\nERROR in %s: %s\n", getContext(context), msg));
+    ex.printStackTrace();
+    ex.printStackTrace(writer);
     if (fatal) {
-      ex.printStackTrace();
-      ex.printStackTrace(writer);
       stopLogging(true);
       System.exit(-1);
     }

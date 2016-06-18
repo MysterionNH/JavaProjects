@@ -1,7 +1,6 @@
 package com.mysterionnh.remotebrowsing;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,46 +9,45 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-
-import com.mysterionnh.Constants;
 import com.mysterionnh.util.IO;
 import com.mysterionnh.util.Logger;
 
 public class AutoImageEnlarger {
   
-  Logger log;
+  private Logger log;
+  private WebDriver driver;
   
   private ArrayList<File> files = new ArrayList<File>();
-  private long startTime;
-  private int imageCount = 0, folderCount = 1;
 
-  public AutoImageEnlarger(Logger _log, String[] args) {
+  private String path = "";
+  
+  private long startTime;
+  
+  private int folderCount = 1;
+  private int imageCount = 0;
+  private int denoiseLvl = 0;
+
+  public AutoImageEnlarger(Logger _log, WebDriver _driver) {
     log = _log;
-    enlarge(args[1], Integer.parseInt(args[2]));
+    driver = _driver;
   }
   
-  private void enlarge(String path, int denoiseLvl) {
+  public void setPath(String path) {
+    this.path = path;
+  }
+
+  public void setDenoiseLevel(int denoiseLvl) {
+    this.denoiseLvl = denoiseLvl;
+  }
+
+  public void enlarge() {
     boolean done = false;
-    
-    System.setProperty("webdriver.chrome.driver", Constants.CHROME_DRIVER_PATH);
-    
-    ChromeOptions options = new ChromeOptions();
-    List<String> chromeArguments = new ArrayList<String>();
-    //makes chrome window hidden by putting it off screen
-    //this does not mean it's unaccessable, it is still in the task bar and can be maximized and put back on screen
-    chromeArguments.add("--window-position=10000,10000");
-    options.addArguments(chromeArguments);
-    WebDriver driver = new ChromeDriver(options);
-    
     String site = "http://waifu2x.booru.pics";
     
     try {
@@ -106,7 +104,7 @@ public class AutoImageEnlarger {
                 WebElement progressBar = driver.findElement(By.className("progress-bar"));
                 while (!progressBar.getAttribute("aria-valuenow").equals("1")) {
                   // still waiting
-                  System.out.println("Waiting for upload to finish...");
+                  System.out.println(progressBar.getAttribute("aria-valuenow"));
                   wait(5000); // do not throttle the connection
                 }
                 wait(1000); // annoying transition, if we hit in it, the image won't be downloaded
@@ -173,11 +171,11 @@ public class AutoImageEnlarger {
       
       out = new FileOutputStream(temp.getAbsolutePath());
       
-      ImageIO.write((RenderedImage)ImageIO.read(urlConnection.getInputStream()), "png", out);
+      ImageIO.write(ImageIO.read(urlConnection.getInputStream()), "png", out);
       
       out.close();
       
-      ImageIO.write((RenderedImage)ImageIO.read(temp), "png", image);
+      ImageIO.write(ImageIO.read(temp), "png", image);
       
       Files.deleteIfExists(Paths.get(temp.getAbsolutePath()));
       

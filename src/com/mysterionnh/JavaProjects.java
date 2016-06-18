@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+
 import com.mysterionnh.util.R;
 import com.mysterionnh.util.Logger;
 
@@ -19,11 +24,17 @@ import com.mysterionnh.remotebrowsing.AutoImageEnlarger;
 
 public class JavaProjects {
 
+  private static WebDriver driver;
   private static Scanner scanner;
   private static Logger log;
   
   private static List<String> helpCommands = new ArrayList<String>();
   private static List<String> modules      = new ArrayList<String>();
+  
+  // Options //TODO: expand
+  private boolean browsingGui = true;
+  
+  private AutoImageEnlarger aie = null;
 
   public static void main(String[] args) {
     if (args.length == 0 || args == null) {
@@ -36,7 +47,8 @@ public class JavaProjects {
   }
   
   public JavaProjects() {
-    iniLists();  
+    iniLists();
+    System.setProperty("webdriver.chrome.driver", Constants.CHROME_DRIVER_PATH);
     scanner = new Scanner(System.in);
     log = new Logger(true);
   }
@@ -60,22 +72,66 @@ public class JavaProjects {
     } else if (modules.contains(args[0])) {
       if (helpCommands.contains(args[1]) && args[2].isEmpty()) {
         log.logString(String.format("\n%s\n", R.getResource(Constants.STRING_RESOURCE_PATH, String.format("main_%s_help_ext", modules.indexOf(args[1])))));
+      } else if (args[2].equals("o")) { // TODO: verify arg count ^^
+        switch (args[3].toLowerCase()) {
+          case "browsinggui" :
+          {
+            browsingGui = Boolean.valueOf(args[4]);
+            log.logString(String.format("Browsing GUI : %b", browsingGui));
+            break;
+          }
+          default:
+          {
+            log.logString("No such option! Available options are:\n");
+            log.logString(R.getResource(Constants.STRING_RESOURCE_PATH, "available_options"));
+          }
+        }
       } else {
         switch (modules.indexOf(args[0])) {
-          case 1:
+          case 1: case 2: case 3: // remote browsing
           {
-            new AutoImageEnlarger(log, args);
-            break;
-          }
-          case 2:
-          {
-            new RemoteChrome(log, args);
-            break;
-          }
-          case 3:
-          {
-            if (args.length == Saviour.ARGS + 1) {
-              new Saviour(log, args);
+            if (browsingGui) {
+              ChromeOptions options = new ChromeOptions();
+              options.addArguments("start-maximized"); // just personal preference
+              driver = new ChromeDriver(options);
+            } else {
+              driver = new HtmlUnitDriver(); // not fully tested //TODO
+            }
+            switch (modules.indexOf(args[0])) { //TODO: many things started, none finished :/ -args.length, driver.close?, help?
+              case 1:
+              {
+                if (aie == null) {
+                  aie = new AutoImageEnlarger(log, driver);
+                }
+                aie.setPath(args[1]);
+                aie.setDenoiseLevel(Integer.valueOf(args[2]));
+                aie.enlarge();
+                break;
+              }
+              case 2:
+              {
+                new RemoteChrome(log, driver);
+                break;
+              }
+              case 3:
+              {
+                //if (args.length == Saviour.ARGS + 1) {
+                  Saviour s = new Saviour(log, driver);
+                  s.setUrl(args[1]);
+                  s.setFolderPath(args[2]);
+                  s.setTag(args[3]);
+                  List<String> blacklist = new ArrayList<String>();
+                  for (int i = 4; i < args.length; i++) {
+                    if (!args[i].isEmpty()) {
+                      blacklist.add(args[i]);
+                    }
+                  }
+                  s.setBlacklist(blacklist);
+                  s.ripSite(args[1]);
+                //}
+                break;
+              }
+              default: log.logString("Defuq?!");
             }
             break;
           }
