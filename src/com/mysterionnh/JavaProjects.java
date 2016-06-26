@@ -10,6 +10,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
 import com.mysterionnh.util.R;
+//import com.mysterionnh.util.IO;
 import com.mysterionnh.util.Logger;
 
 import com.mysterionnh.tinker.Primes;
@@ -21,6 +22,7 @@ import com.mysterionnh.tinker.umlgenerator.UMLGenerator;
 import com.mysterionnh.remotebrowsing.Saviour;
 import com.mysterionnh.remotebrowsing.RemoteChrome;
 import com.mysterionnh.remotebrowsing.AutoImageEnlarger;
+import com.mysterionnh.remotebrowsing.RedditCrawler;
 
 public class JavaProjects {
 
@@ -88,11 +90,11 @@ public class JavaProjects {
         }
       } else {
         switch (modules.indexOf(args[0])) {
-          case 1: case 2: case 3: // remote browsing
+          case 1: case 2: case 3: case 4:// remote browsing
           {
             if (browsingGui) {
               ChromeOptions options = new ChromeOptions();
-              options.addArguments("start-maximized"); // just personal preference
+              //options.addArguments("start-maximized"); // just personal preference
               driver = new ChromeDriver(options);
             } else {
               driver = new HtmlUnitDriver(); // not fully tested //TODO
@@ -131,31 +133,38 @@ public class JavaProjects {
                 //}
                 break;
               }
+              case 4:
+              {
+                RedditCrawler rcl = new RedditCrawler(log, driver);
+                rcl.crawlImageSubreddit(args[1], Integer.valueOf(args[2]), Boolean.valueOf(args[3]));
+                driver.close();
+                break;
+              }
               default: log.logString("Defuq?!");
             }
             break;
           }
-          case 4:
+          case 5:
           {
             new Binarier(log, args);
             break;
           }
-          case 5:
+          case 6:
           {
             new GameOfLife(log, args);
             break;
           }
-          case 6:
+          case 7:
           {
             new LibraryOfBabel(log, args);
             break;
           }
-          case 7:
+          case 8:
           {
             new Primes(log, args);
             break;
           }
-          case 8:
+          case 9:
           {
             new UMLGenerator(log, args);
             break;
@@ -186,6 +195,7 @@ public class JavaProjects {
     modules.add("aie");
     modules.add("rec");
     modules.add("sav");
+    modules.add("rcl");
     modules.add("bir");
     modules.add("gof");
     modules.add("lob");

@@ -35,7 +35,7 @@ public class Saviour {
   }
 
   public void setUrl(String url) {
-    galleries.add(url);
+    galleries.add(url.toLowerCase());
   }
 
   public void setTag(String tag) {
@@ -43,7 +43,7 @@ public class Saviour {
   }
 
   public void setFolderPath(String folderPath) {
-    this.folderPath = folderPath;
+    this.folderPath = folderPath.toLowerCase();
   }
   
   public void setBlacklist(List<String> bl) {
@@ -53,6 +53,7 @@ public class Saviour {
   public void ripSite(String start) {
     while (!galleries.isEmpty()) {
       if (!galleries.peek().equals(start)) done.add(galleries.peek());
+      
       driver.get(galleries.pop());
   
       String currentUrl;
