@@ -78,7 +78,7 @@ public class RedditCrawler {
         ImageIO.write(ImageIO.read(urlConnection.getInputStream()), "png", fos);
         fos.close();
         
-        log.logString(String.format("\nDownloaded reddit post \"%s\" (imgur address: \"%s\"", imageElementNames.get(i), currentUrl));
+        log.logString(String.format("\nDownloaded reddit post \"%s\" (imgur address: \"%s\")", imageElementNames.get(i), currentUrl));
       } catch (Exception ex) {
         log.logError(this, "Error", false, ex);
       }

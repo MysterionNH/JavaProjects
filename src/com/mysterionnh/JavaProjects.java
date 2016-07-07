@@ -74,8 +74,8 @@ public class JavaProjects {
     } else if (modules.contains(args[0])) {
       if (helpCommands.contains(args[1]) && args[2].isEmpty()) {
         log.logString(String.format("\n%s\n", R.getResource(Constants.STRING_RESOURCE_PATH, String.format("main_%s_help_ext", modules.indexOf(args[1])))));
-      } else if (args[2].equals("o")) { // TODO: verify arg count ^^
-        switch (args[3].toLowerCase()) {
+      } else if (args[1].equals("o")) { // TODO: verify arg count ^^
+        switch (args[2].toLowerCase()) {
           case "browsinggui" :
           {
             browsingGui = Boolean.valueOf(args[4]);
