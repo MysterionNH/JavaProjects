@@ -33,7 +33,7 @@ public class RedditCrawler {
     
     
     for (int i = 0; i < maxCrawlDepth; i++) {
-      if (!pageUrls.peekFirst().isEmpty()) {
+      if (pageUrls.peekFirst() != null && !pageUrls.peekFirst().isEmpty()) {
         
         driver.get(pageUrls.pollFirst());
         

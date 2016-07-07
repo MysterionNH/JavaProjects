@@ -208,4 +208,29 @@ public class AutoImageEnlarger {
     
     return (width < 2560 && height < 2560 && image.length() < 5000000L);
   }
+  
+  public void enlargeWithGoogle() {
+    try {
+      getFiles(path);
+    } catch (IOException e) {
+      log.logError(this, "Unable to access Images!", true, e);
+    }
+    
+    for (File image : files) {     
+      driver.get("https://www.google.com/imghp");
+      driver.findElement(By.className("gsst_a")).click();
+      driver.findElement(By.cssSelector(".qbtbha.qbtbtxt.qbclr")).click();
+      
+      WebElement fileUpload = driver.findElement(By.id("qbfile"));
+      
+      if (fileUpload != null) {
+        fileUpload.sendKeys(image.getAbsolutePath());
+        //driver.findElement(By.id("submit")).click();
+      }
+      
+      wait(7500);
+      
+      
+    }
+  }
 }

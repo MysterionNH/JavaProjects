@@ -17,6 +17,7 @@ import com.mysterionnh.tinker.Primes;
 import com.mysterionnh.tinker.Binarier;
 import com.mysterionnh.tinker.GameOfLife;
 import com.mysterionnh.tinker.LibraryOfBabel;
+import com.mysterionnh.tinker.NumberConverter;
 import com.mysterionnh.tinker.umlgenerator.UMLGenerator;
 
 import com.mysterionnh.remotebrowsing.Saviour;
@@ -39,6 +40,13 @@ public class JavaProjects {
   private AutoImageEnlarger aie = null;
 
   public static void main(String[] args) {
+    log = new Logger(true);
+    NumberConverter nc = new NumberConverter(log);
+    nc.setFormat(args[1].charAt(2));
+    nc.setNumber(args[0]);
+    nc.show();
+    
+    /*
     if (args.length == 0 || args == null) {
       System.out.println("Hello World!");
     } else {
@@ -46,6 +54,7 @@ public class JavaProjects {
       jp.handleInput(args);
       log.stopLogging(true);
     }
+    */
   }
   
   public JavaProjects() {
@@ -97,7 +106,7 @@ public class JavaProjects {
               //options.addArguments("start-maximized"); // just personal preference
               driver = new ChromeDriver(options);
             } else {
-              driver = new HtmlUnitDriver(); // not fully tested //TODO
+              //driver = new HtmlUnitDriver(); // not fully tested //TODO
             }
             switch (modules.indexOf(args[0])) { //TODO: many things started, none finished :/ -args.length, driver.close?, help?
               case 1:
@@ -107,7 +116,8 @@ public class JavaProjects {
                 }
                 aie.setPath(args[1]);
                 aie.setDenoiseLevel(Integer.valueOf(args[2]));
-                aie.enlarge();
+                //aie.enlarge();
+                aie.enlargeWithGoogle();
                 break;
               }
               case 2:
