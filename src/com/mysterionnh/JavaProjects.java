@@ -7,7 +7,7 @@ import java.util.Scanner;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+//import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
 import com.mysterionnh.util.R;
 //import com.mysterionnh.util.IO;
@@ -22,6 +22,7 @@ import com.mysterionnh.tinker.umlgenerator.UMLGenerator;
 
 import com.mysterionnh.remotebrowsing.Saviour;
 import com.mysterionnh.remotebrowsing.RemoteChrome;
+import com.mysterionnh.exception.InvalidCharInNumberException;
 import com.mysterionnh.remotebrowsing.AutoImageEnlarger;
 import com.mysterionnh.remotebrowsing.RedditCrawler;
 
@@ -43,7 +44,12 @@ public class JavaProjects {
     log = new Logger(true);
     NumberConverter nc = new NumberConverter(log);
     nc.setFormat(args[1].charAt(2));
-    nc.setNumber(args[0]);
+    try {
+      nc.setNumber(args[0]);
+    } catch (InvalidCharInNumberException e) {
+      e.printStackTrace();
+      return;
+    }
     nc.show();
     
     /*

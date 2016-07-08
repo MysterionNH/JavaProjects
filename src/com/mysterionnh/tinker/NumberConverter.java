@@ -1,5 +1,8 @@
 package com.mysterionnh.tinker;
 
+import java.math.BigInteger;
+
+import com.mysterionnh.exception.InvalidCharInNumberException;
 import com.mysterionnh.util.Logger;
 import com.mysterionnh.util.Strings;
 
@@ -7,12 +10,14 @@ public class NumberConverter {
   
   private Logger log;
   
+  private char givenFormat = 'x';
+  private BigInteger number;
+  BigInteger TWO = BigInteger.valueOf(2L);
+  BigInteger SIXTEEN = BigInteger.valueOf(16L);
+  
   public NumberConverter(Logger _log) {
     log = _log;
   }
-  
-  private char givenFormat = 'x';
-  private int number = 0;
   
   public boolean setFormat(char _givenFormat) {
     if (_givenFormat == 'd' || _givenFormat == 'b' || _givenFormat == 'h') {
@@ -24,24 +29,23 @@ public class NumberConverter {
     return true;
   }
   
-  public void setNumber(String numberToConvert) {
+  public void setNumber(String numberToConvert) throws InvalidCharInNumberException {
     //numberToConvert = numberToConvert.replaceAll(".", "");
     
     switch (givenFormat) {
       case 'd':
       {
-        number = Integer.parseInt(numberToConvert);
+        number = decodeDecNumber(numberToConvert);
         break;
       }
       case 'b':
       {
-        number = decodeBinaryNumber(numberToConvert);
+        number = decodeBinNumber(numberToConvert);
         break;
       }
       case 'h':
       {
-        numberToConvert = "0x" + numberToConvert;
-        number = Integer.decode(numberToConvert);
+        number = decodeHexNumber(numberToConvert);
         break;
       }
       default: log.logError(this, "Invalid number format!", false);
@@ -52,42 +56,74 @@ public class NumberConverter {
     switch (givenFormat) {
       case 'd':
       {
-        log.logString(String.format("\nBin:\t%s\nHex:\t%s\n", Strings.beautifyBinStr(Integer.toBinaryString(number)), Strings.beautifyHexStr(Integer.toHexString(number).toUpperCase())));
+        log.logString(String.format("\nHex:\t%s\nBin:\t%s\n",
+            Strings.beautifyHexStr(Strings.toHexString(number.toByteArray()).toUpperCase()),
+            Strings.beautifyBinStr(Strings.toBinString(number.toByteArray()))));
         break;
       }
       case 'b':
       {
-        log.logString(String.format("\nDec:\t%s\nHex:\t%s\n", Strings.leftPad(Integer.toString(number), 34, ' '), Strings.beautifyHexStr(Integer.toHexString(number).toUpperCase())));
+        log.logString(String.format("\nDec:\t%s\nHex:\t%s\n",
+            Strings.leftPad(number.toString(), calcPadding(number.bitCount()), ' '),
+            Strings.beautifyHexStr(Strings.toHexString(number.toByteArray()).toUpperCase())));
         break;
       }
       case 'h':
       {
-        log.logString(String.format("\nDec:\t%s\nBin:\t%s\n", Strings.leftPad(Integer.toString(number), 34, ' '), Strings.beautifyBinStr(Integer.toBinaryString(number))));
+        log.logString(String.format("\nDec:\t%s\nBin:\t%s\n",
+            Strings.leftPad(number.toString(), calcPadding(number.bitCount()), ' '),
+            Strings.beautifyBinStr(Strings.toBinString(number.toByteArray()))));
         break;
       }
       default: log.logError(this, "Invalid number format!", false);
     }
   }
-  
-  private int decodeBinaryNumber(String str) {
-    int solution = 0;
+  // TODO: Optimize to only use BIMath when needed, because it really lacks performance ^^
+  private BigInteger decodeBinNumber(String str) throws InvalidCharInNumberException {
+    BigInteger localTwo = TWO;
+    BigInteger result = new BigInteger("0");
     str = Strings.revert(str);
     
-    if (isBinaryString(str)) {
+    if (Strings.isValidBinString(str)) {
       for (int i = 0; i < str.length(); i++) {
-        solution += (Integer.parseInt(String.valueOf(str.charAt(i))) * Math.pow(2, i));
+        localTwo = TWO;
+        BigInteger temp = localTwo.pow(i);
+        result = result.add(temp.multiply(new BigInteger(String.valueOf(str.charAt(i)))));
       }
+    } else {
+      throw new InvalidCharInNumberException();
     }
     
-    return solution;
+    return result;
+  }
+  // TODO: Optimize to only use BIMath when needed, because it really lacks performance ^^
+  private BigInteger decodeHexNumber(String str) throws InvalidCharInNumberException {
+    BigInteger localSixteen = SIXTEEN;
+    BigInteger result = new BigInteger("0");
+    str = Strings.revert(str);
+    
+    if (Strings.isValidBinString(str)) {
+      for (int i = 0; i < str.length(); i++) {
+        localSixteen = SIXTEEN;
+        BigInteger temp = localSixteen.pow(i);
+        result = result.add(temp.multiply(new BigInteger(String.valueOf(Character.getNumericValue(str.charAt(i))))));
+      }
+    } else {
+      throw new InvalidCharInNumberException();
+    }
+    
+    return result;
   }
   
-  private boolean isBinaryString(String str) {
-    for (char c : str.toCharArray()) {
-      if (!(c != '1' || c != '0')) {
-        return false;
-      }
+  private BigInteger decodeDecNumber(String str) throws InvalidCharInNumberException {
+    if (Strings.isValidDecString(str)) {
+      return new BigInteger(str);
+    } else {
+      throw new InvalidCharInNumberException();
     }
-    return true;
+  }
+  
+  private int calcPadding(int numLength) {
+    return numLength < 32 ? 31 : (int)(Math.ceil(number.bitCount() / 8)); //FIXME: 08.07.16
   }
 }

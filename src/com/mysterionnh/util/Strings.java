@@ -38,17 +38,58 @@ public class Strings {
       temp += hexStr.charAt(i);
     }
     
-    return "       " + revert(temp);
+    return "      " + revert(temp);
   }
   
-  public static String leftPad(String str, int padding, char padder) {
-    
+  public static String leftPad(String str, int padding, char padder) {    
     if (!(str.length() >= padding)) {
       for (int i = padding - (str.length()); i > -1; i--) {
         str = padder + str;
       }
     }
-    
     return str;
+  }
+  
+  public static boolean isValidDecString(String str) {
+    for (char c : str.toCharArray()) {
+      if (!Character.isDigit(c)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  
+  public static boolean isValidHexString(String str) {
+    for (char c : str.toCharArray()) {
+      if (!Characters.isHexChar(c)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public static boolean isValidBinString(String str) {
+    for (char c : str.toCharArray()) {
+      if (!(c != '1' || c != '0')) {
+        return false;
+      }
+    }
+    return true;
+  }
+  
+  public static String toBinString(byte[] bytes) {
+    String result = "";
+    for (byte b : bytes) {
+      result += Integer.toBinaryString((b & 0xFF) + 0x100).substring(1);
+    }
+    return result;
+  }
+  
+  public static String toHexString(byte[] bytes) {
+    String result = "";
+    for (byte b : bytes) {
+      result += String.format("%02x", b).toUpperCase();
+    }
+    return result;
   }
 }
