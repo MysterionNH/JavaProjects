@@ -1,5 +1,6 @@
 package com.mysterionnh.tinker;
 
+import com.mysterionnh.JavaProjects;
 import com.mysterionnh.util.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -124,11 +125,11 @@ public class LibraryOfBabel {
             address = br.readLine();
         } catch (Exception e) {
             System.err.println("Invalid file path! Make sure that you don\'t have spelling mistakes in your path.");
-            System.exit(1);
+            JavaProjects.shutdown(1, true);
         }
         if (address.isEmpty()) {
             System.err.println("Invalid file path! Make sure that you don\'t have spelling mistakes in your path.");
-            System.exit(1);
+            JavaProjects.shutdown(1, true);
         }
         return address;
     }

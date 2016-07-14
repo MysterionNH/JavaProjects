@@ -1,5 +1,6 @@
 package com.mysterionnh.remotebrowsing;
 
+import com.mysterionnh.JavaProjects;
 import com.mysterionnh.util.Logger;
 import org.openqa.selenium.WebDriver;
 
@@ -18,8 +19,7 @@ public class RemoteChrome {
         driver = _driver;
         driver.get(url);
         log.logString(String.format("Navigated to \"%s\"", url));
-        log.stopLogging(true);
-        System.exit(0);
+        JavaProjects.shutdown(0, true);
     }
 
     public void navigate(String url) {

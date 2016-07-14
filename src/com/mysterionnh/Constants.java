@@ -6,4 +6,6 @@ public class Constants {
     public static final String CHROME_DRIVER_PATH = "dependencies/cd.exe";
 
     public static final int MAX_ARGS_LENGTH = 10;
+
+    public static final char TRUEc = 1;
 }

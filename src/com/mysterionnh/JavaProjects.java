@@ -36,26 +36,13 @@ public class JavaProjects {
     private AutoImageEnlarger aie = null;
 
     public static void main(String[] args) {
-        log = new Logger(true);
-        NumberConverter nc = new NumberConverter(log);
-        nc.setFormat(args[1].charAt(2));
-        try {
-            nc.setNumber(args[0]);
-        } catch (InvalidCharInNumberException e) {
-            e.printStackTrace();
-            return;
+        if (args.length == 0 || args == null) {
+            System.out.println("Hello World!");
+        } else {
+            JavaProjects jp = new JavaProjects();
+            jp.handleInput(args);
+            log.stopLogging(true);
         }
-        nc.show();
-    
-    /*
-    if (args.length == 0 || args == null) {
-      System.out.println("Hello World!");
-    } else {
-      JavaProjects jp = new JavaProjects();
-      jp.handleInput(args);
-      log.stopLogging(true);
-    }
-    */
     }
 
     public JavaProjects() {
@@ -125,11 +112,14 @@ public class JavaProjects {
                                 break;
                             }
                             case 2: {
-                                new RemoteChrome(log, driver);
+                                RemoteChrome rc = new RemoteChrome(log, driver);
+                                if (!args[1].isEmpty())
+                                    rc.navigate(args[1]);
+                                if (!args[2].isEmpty() && Boolean.valueOf(args[2])) // TODO: this should actually move chrome into fullscreen needs to be implemented
+                                    shutdown(1, true);
                                 break;
                             }
                             case 3: {
-                                //if (args.length == Saviour.ARGS + 1) {
                                 Saviour s = new Saviour(log, driver);
                                 s.setUrl(args[1]);
                                 s.setFolderPath(args[2]);
@@ -142,7 +132,6 @@ public class JavaProjects {
                                 }
                                 s.setBlacklist(blacklist);
                                 s.ripSite(args[1]);
-                                //}
                                 break;
                             }
                             case 4: {
@@ -176,9 +165,22 @@ public class JavaProjects {
                         new UMLGenerator(log, args);
                         break;
                     }
+                    case 10: {
+                        //if (NumberConverter.ARGS >= args.length - 1) {
+                        NumberConverter nuc = new NumberConverter(log);
+                        nuc.setFormat(args[2].charAt(2));
+                        try {
+                            nuc.setNumber(args[1]);
+                        } catch (InvalidCharInNumberException e) {
+                            log.logError(this, e.getMessage(), true, e);
+                        }
+                        nuc.show();
+                        //}
+                        break;
+                    }
                     default: {
                         // This should never happen.
-                        log.logError(this, "\nDon't even ask", true);
+                        log.logError(this, String.format("\nModule exists but doesn't have a number:%d", modules.indexOf(args[0])), true);
                     }
                 }
             }
@@ -205,6 +207,7 @@ public class JavaProjects {
         modules.add("lob");
         modules.add("pri");
         modules.add("umg");
+        modules.add("nuc");
         //modules.add("muf");
     }
 
@@ -215,5 +218,10 @@ public class JavaProjects {
 
     private String buildHelpText() {
         return String.format("\n%s\n", R.getResource(Constants.STRING_RESOURCE_PATH, "main_general_help"));
+    }
+
+    public static void shutdown(int shutdownStatus, boolean logTimeStamp) {
+        log.stopLogging(logTimeStamp);
+        System.exit(shutdownStatus);
     }
 }

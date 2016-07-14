@@ -1,5 +1,6 @@
 package com.mysterionnh.tinker;
 
+import com.mysterionnh.Constants;
 import com.mysterionnh.exception.InvalidCharInNumberException;
 import com.mysterionnh.util.Logger;
 import com.mysterionnh.util.Strings;
@@ -7,6 +8,8 @@ import com.mysterionnh.util.Strings;
 import java.math.BigInteger;
 
 public class NumberConverter {
+
+    public static final int ARGS = 2;
 
     private final Logger log;
 
@@ -79,14 +82,14 @@ public class NumberConverter {
         BigInteger result = new BigInteger("0");
         str = Strings.revert(str);
 
-        if (Strings.isValidBinString(str)) {
+        if (Strings.isValidBinString(str) == Constants.TRUEc) {
             for (int i = 0; i < str.length(); i++) {
                 localTwo = TWO;
                 BigInteger temp = localTwo.pow(i);
                 result = result.add(temp.multiply(new BigInteger(String.valueOf(str.charAt(i)))));
             }
         } else {
-            throw new InvalidCharInNumberException();
+            throw new InvalidCharInNumberException(String.format("Unsupported character in binary number: \'%s\'", Strings.isValidBinString(str)));
         }
 
         return result;
@@ -98,24 +101,24 @@ public class NumberConverter {
         BigInteger result = new BigInteger("0");
         str = Strings.revert(str);
 
-        if (Strings.isValidBinString(str)) {
+        if (Strings.isValidBinString(str) == Constants.TRUEc) {
             for (int i = 0; i < str.length(); i++) {
                 localSixteen = SIXTEEN;
                 BigInteger temp = localSixteen.pow(i);
                 result = result.add(temp.multiply(new BigInteger(String.valueOf(Character.getNumericValue(str.charAt(i))))));
             }
         } else {
-            throw new InvalidCharInNumberException();
+            throw new InvalidCharInNumberException(String.format("Unsupported character in hexadecimal number: \'%s\'", Strings.isValidBinString(str)));
         }
 
         return result;
     }
 
     private BigInteger decodeDecNumber(String str) throws InvalidCharInNumberException {
-        if (Strings.isValidDecString(str)) {
+        if (Strings.isValidDecString(str) == Constants.TRUEc) {
             return new BigInteger(str);
         } else {
-            throw new InvalidCharInNumberException();
+            throw new InvalidCharInNumberException(String.format("Unsupported character in number: \'%s\'", Strings.isValidBinString(str)));
         }
     }
 

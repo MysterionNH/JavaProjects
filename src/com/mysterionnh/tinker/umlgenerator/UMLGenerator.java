@@ -1,5 +1,6 @@
 package com.mysterionnh.tinker.umlgenerator;
 
+import com.mysterionnh.JavaProjects;
 import com.mysterionnh.util.Logger;
 
 import java.io.File;
@@ -25,7 +26,7 @@ public class UMLGenerator {
                         break;
                     default:
                         log.logString("Unknown argument: \"" + args[1] + "\". Available arguments are \"-file\" and \"-folder\"");
-                        System.exit(-1);
+                        JavaProjects.shutdown(-1, true);
                 }
             } catch (IOException e) {
                 log.logError(this, "No such file!", true, e);

@@ -1,5 +1,7 @@
 package com.mysterionnh.util;
 
+import com.mysterionnh.Constants;
+
 public class Strings {
     public static String revert(String str) {
         String temp = "";
@@ -57,27 +59,25 @@ public class Strings {
         return str;
     }
 
-    public static boolean isValidDecString(String str) {
+    public static char isValidDecString(String str) {
         for (char c : str.toCharArray()) {
-            if (!Character.isDigit(c)) return false;
+            if (!Character.isDigit(c)) return c;
         }
-        return true;
+        return Constants.TRUEc;
     }
 
-    public static boolean isValidHexString(String str) {
+    public static char isValidHexString(String str) {
         for (char c : str.toCharArray()) {
-            if (!Characters.isHexChar(c)) {
-                return false;
-            }
+            if (!Characters.isHexChar(c)) return c;
         }
-        return true;
+        return Constants.TRUEc;
     }
 
-    public static boolean isValidBinString(String str) {
+    public static char isValidBinString(String str) {
         for (char c : str.toCharArray()) {
-            if (c != '1' && c != '0') return false;
+            if (c != '1' && c != '0') return c;
         }
-        return true;
+        return Constants.TRUEc;
     }
 
     public static String toBinString(byte[] bytes) {
