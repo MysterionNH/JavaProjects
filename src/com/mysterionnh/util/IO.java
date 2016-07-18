@@ -1,9 +1,13 @@
 package com.mysterionnh.util;
 
+import com.mysterionnh.Constants;
+import org.apache.commons.io.FilenameUtils;
+
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class IO {
@@ -113,5 +117,31 @@ public class IO {
         }
 
         return (count == 0 && !empty) ? 1 : count;
+    }
+
+    public static ArrayList<File> getFiles(String dirPath) {
+        ArrayList<File> content = new ArrayList<>();
+
+        File folder = new File(dirPath);
+
+        if (!folder.exists()) {
+            folder.mkdir();
+        }
+
+        for (File f : folder.listFiles()) {
+            content.add(f);
+
+            if (f.isDirectory()) {
+                content.addAll(getFiles(f.getAbsolutePath()));
+            }
+        }
+        return content;
+    }
+
+    public static boolean pretendsToBeImage(File f) {
+        if (f.isFile()) {
+            System.out.println(f.getAbsolutePath());
+            return Collections.toList(Constants.IMAGE_SUFFIXES).contains(FilenameUtils.getExtension(f.getPath().toLowerCase()));
+        } else return false;
     }
 }

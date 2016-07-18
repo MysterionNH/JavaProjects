@@ -22,7 +22,6 @@ import java.util.Scanner;
 
 public class JavaProjects {
 
-    @SuppressWarnings("FieldCanBeLocal")
     private static WebDriver driver;
     private static Scanner scanner;
     private static Logger log;
@@ -36,6 +35,18 @@ public class JavaProjects {
     private AutoImageEnlarger aie = null;
 
     public static void main(String[] args) {
+        System.setProperty("webdriver.chrome.driver", "E:\\Niklas\\My Stuff\\PC Files\\Desktop\\JP\\dependencies\\cd.exe");
+
+        log = new Logger();
+        driver = getDriver("en"); // making sure chrome is in english
+
+        AutoImageEnlarger aie = new AutoImageEnlarger(log, driver);
+        aie.setPath("E:\\Niklas\\My Stuff\\PC Files\\Desktop\\science\\media\\needssorting");
+        aie.enlargeWithGoogle();
+
+        JavaProjects.shutdown(0);
+
+        /*
         if (args.length == 0 || args == null) {
             System.out.println("Hello World!");
         } else {
@@ -43,13 +54,14 @@ public class JavaProjects {
             jp.handleInput(args);
             log.stopLogging(true);
         }
+        */
     }
 
     public JavaProjects() {
         iniLists();
         System.setProperty("webdriver.chrome.driver", Constants.CHROME_DRIVER_PATH);
         scanner = new Scanner(System.in);
-        log = new Logger(true);
+        log = new Logger();
     }
 
     private void handleInput(String[] _args) {
@@ -98,9 +110,9 @@ public class JavaProjects {
                             ChromeOptions options = new ChromeOptions();
                             //options.addArguments("start-maximized"); // just personal preference
                             driver = new ChromeDriver(options);
-                            //driver = new HtmlUnitDriver(); // not fully tested //TODO: Implement remote browsing in a way HtmlUnitDriver can handle
+                            //driver = new HtmlUnitDriver(); // not fully tested // TODO: Implement remote browsing in a way HtmlUnitDriver can handle (headless browsing-maybe use an entire different way)
                         }
-                        switch (modules.indexOf(args[0])) { //TODO: many things started, none finished :/ -args.length, driver.close?, help?
+                        switch (modules.indexOf(args[0])) { // TODO: many things started, none finished: args.length, driver.close?, help?
                             case 1: {
                                 if (aie == null) {
                                     aie = new AutoImageEnlarger(log, driver);
@@ -116,7 +128,7 @@ public class JavaProjects {
                                 if (!args[1].isEmpty())
                                     rc.navigate(args[1]);
                                 if (!args[2].isEmpty() && Boolean.valueOf(args[2])) // TODO: this should actually move chrome into fullscreen needs to be implemented
-                                    shutdown(1, true);
+                                    shutdown(1);
                                 break;
                             }
                             case 3: {
@@ -220,8 +232,17 @@ public class JavaProjects {
         return String.format("\n%s\n", R.getResource(Constants.STRING_RESOURCE_PATH, "main_general_help"));
     }
 
-    public static void shutdown(int shutdownStatus, boolean logTimeStamp) {
-        log.stopLogging(logTimeStamp);
+    private static WebDriver getDriver(String locale) {
+        System.setProperty("webdriver.chrome.driver", Constants.DEBUG ? Constants.DEBUG_CHROME_DRIVER_PATH : Constants.CHROME_DRIVER_PATH);
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--lang=" + locale);
+        return new ChromeDriver(options);
+    }
+
+    public static void shutdown(int shutdownStatus) {
+        log.stopLogging();
+        if (driver != null)
+            driver.close();
         System.exit(shutdownStatus);
     }
 }

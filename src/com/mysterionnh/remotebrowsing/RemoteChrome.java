@@ -19,7 +19,7 @@ public class RemoteChrome {
         driver = _driver;
         driver.get(url);
         log.logString(String.format("Navigated to \"%s\"", url));
-        JavaProjects.shutdown(0, true);
+        JavaProjects.shutdown(0);
     }
 
     public void navigate(String url) {

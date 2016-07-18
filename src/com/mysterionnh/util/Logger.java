@@ -12,7 +12,6 @@ public class Logger {
     private PrintWriter writer;
     private final String dateFormat = "dd.MM.yyyy HH:mm:ss";
     private long startTime;
-    @SuppressWarnings("FieldCanBeLocal")
     private long endTime;
 
 
@@ -31,29 +30,8 @@ public class Logger {
             e.printStackTrace();
             System.exit(-1);
         }
-    }
-
-    public Logger(boolean start) {
-        try {
-            writer = new PrintWriter("log.txt", "UTF8");
-        } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            e.printStackTrace();
-            System.exit(-1);
-            return;
-        }
-        try {
-            IO.clearFile("log.txt");
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-            return;
-        }
-        if (start) startLogging(true);
-    }
-
-    public void startLogging(boolean showTimeStamp) {
         startTime = System.currentTimeMillis();
-        writer.write(showTimeStamp ? "Started logging at " + formatTime(dateFormat, startTime) + "\n\n" : "");
+        writer.write("Started logging at " + formatTime(dateFormat, startTime) + "\n\n");
     }
 
     public void logString(Object o) {
@@ -71,7 +49,7 @@ public class Logger {
         writer.println(msg);
         writer.println("\t\t --ERROR--");
         if (fatal) {
-            stopLogging(true);
+            stopLogging();
             System.exit(-1);
         }
     }
@@ -82,17 +60,14 @@ public class Logger {
         ex.printStackTrace();
         ex.printStackTrace(writer);
         if (fatal) {
-            stopLogging(true);
+            stopLogging();
             System.exit(-1);
         }
     }
 
-    public void stopLogging(boolean showTimeStamp) {
+    public void stopLogging() {
         endTime = System.currentTimeMillis();
-        writer.write(showTimeStamp ? "\n\n\nStopped logging at " +
-                formatTime(dateFormat, endTime) +
-                ". The program run for " +
-                formatTime("MM:ss", endTime - startTime) + "." : "");
+        writer.write("\n\n\nStopped logging at " + formatTime(dateFormat, endTime) + ". The program run for " + formatTime("MM:ss", endTime - startTime) + ".");
         writer.close();
     }
 

@@ -26,7 +26,7 @@ public class UMLGenerator {
                         break;
                     default:
                         log.logString("Unknown argument: \"" + args[1] + "\". Available arguments are \"-file\" and \"-folder\"");
-                        JavaProjects.shutdown(-1, true);
+                        JavaProjects.shutdown(-1);
                 }
             } catch (IOException e) {
                 log.logError(this, "No such file!", true, e);

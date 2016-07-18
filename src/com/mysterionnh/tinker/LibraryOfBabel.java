@@ -125,11 +125,11 @@ public class LibraryOfBabel {
             address = br.readLine();
         } catch (Exception e) {
             System.err.println("Invalid file path! Make sure that you don\'t have spelling mistakes in your path.");
-            JavaProjects.shutdown(1, true);
+            JavaProjects.shutdown(1);
         }
         if (address.isEmpty()) {
             System.err.println("Invalid file path! Make sure that you don\'t have spelling mistakes in your path.");
-            JavaProjects.shutdown(1, true);
+            JavaProjects.shutdown(1);
         }
         return address;
     }

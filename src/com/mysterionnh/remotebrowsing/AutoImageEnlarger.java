@@ -16,17 +16,18 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class AutoImageEnlarger {
 
     private final Logger log;
     private final WebDriver driver;
 
-    private final ArrayList<File> files = new ArrayList<>();
+    private ArrayList<File> files = new ArrayList<>();
 
     private String path = "";
 
-    private int folderCount = 1;
     private int imageCount = 0;
     private int denoiseLvl = 0;
 
@@ -47,7 +48,7 @@ public class AutoImageEnlarger {
         boolean done;
         String site = "http://waifu2x.booru.pics";
 
-        getFiles(path);
+        files = IO.getFiles(path);
 
         long startTime = System.currentTimeMillis();
 
@@ -105,9 +106,7 @@ public class AutoImageEnlarger {
                                 receiveNewImage(driver, image);
                             }
                             receiveNewImage(driver, image);
-                        } else {
-                            System.err.println("Already big enough...\n");
-                        }
+                        } else System.err.println("Already big enough...\n");
                     } else {
                         receiveNewImage(driver, image);
                     }
@@ -119,23 +118,7 @@ public class AutoImageEnlarger {
 
         driver.close();
 
-        System.out.println("\nDone. Completed " + imageCount + " images from "
-                + folderCount + " folders in " + (System.currentTimeMillis() - startTime) / 1000 + "s.");
-    }
-
-    private void getFiles(String path) {
-        File folder = new File(path);
-        if (!folder.exists()) {
-            folder.mkdir();
-        }
-        for (File f : folder.listFiles()) {
-            files.add(f);
-
-            if (f.isDirectory()) {
-                folderCount++;
-                getFiles(f.getAbsolutePath());
-            }
-        }
+        System.out.println("\nDone. Completed " + imageCount + " images in " + (System.currentTimeMillis() - startTime) / 1000 + "s.");
     }
 
     private void receiveNewImage(WebDriver driver, File image) {
@@ -154,7 +137,7 @@ public class AutoImageEnlarger {
         }
     }
 
-    private void getImage(String url, File image) throws Exception {
+    private void getImage(String url, File image) {
         FileOutputStream out = null;
         File temp = new File(image.getAbsolutePath() + ".temp");
         try {
@@ -173,17 +156,14 @@ public class AutoImageEnlarger {
 
             System.out.println("Done: \"" + image.getAbsolutePath() + "\".\n");
         } catch (Exception e) {
-            out.close();
-            Files.deleteIfExists(Paths.get(temp.getAbsolutePath()));
-            throw e;
-        }
-    }
-
-    private void wait(int timeInMs) {
-        try {
-            Thread.sleep(timeInMs);
-        } catch (InterruptedException e) {
-            log.logError(this, "", true, e);
+            try {
+                out.close();
+                Files.deleteIfExists(Paths.get(temp.getAbsolutePath()));
+            } catch (IOException ex) {
+                // well.. fuck
+                log.logError(this, "", true, ex);
+            }
+            log.logError(this, "", true);
         }
     }
 
@@ -201,24 +181,61 @@ public class AutoImageEnlarger {
         return (width < 2560 && height < 2560 && image.length() < 5000000L);
     }
 
+    // weird hackery, but works
     public void enlargeWithGoogle() {
-        getFiles(path);
+        files.addAll(IO.getFiles(path).stream().filter(IO::pretendsToBeImage).collect(Collectors.toList()));
 
         for (File image : files) {
             driver.get("https://www.google.com/imghp");
+
+            wait(20);
+
             driver.findElement(By.className("gsst_a")).click();
+
             driver.findElement(By.cssSelector(".qbtbha.qbtbtxt.qbclr")).click();
 
-            WebElement fileUpload = driver.findElement(By.id("qbfile"));
+            driver.findElement(By.id("qbfile")).sendKeys(image.getAbsolutePath());
 
-            if (fileUpload != null) {
-                fileUpload.sendKeys(image.getAbsolutePath());
-                //driver.findElement(By.id("submit")).click();
+            List<WebElement> allSizeLink = driver.findElements(By.tagName("a")).stream().filter(this::isAllSizesLink).collect(Collectors.toList());
+
+            if (allSizeLink.isEmpty()) {
+                log.logString(String.format("No other image found for image at \"%s\"\n", image.getAbsolutePath()));
+                continue;
             }
 
-            wait(7500);
+            allSizeLink.get(0).click();
 
+            // not necessary, but looks better
+            // TODO: resulted in error when image pretends to have larger versions but hasn't (yes that happened) - testing
+            if (driver.findElements(By.className("rg_l")) != null)
+                ((WebElement) driver.findElements(By.className("rg_l")).toArray()[0]).click();
 
+            String src = driver.getPageSource();
+
+            BufferedImage img = null;
+            try {
+                img = ImageIO.read(image);
+            } catch (IOException e) {
+                log.logError(this, "Unable to access Image!", true, e);
+            }
+
+            if (Integer.valueOf(src.substring(src.indexOf("\",\"oh\":") + 7, src.indexOf(",\"ou\":\""))) * Integer.valueOf(src.substring(src.indexOf("\",\"ow\":") + 7, src.indexOf(",\"pt\":\""))) > img.getWidth() * img.getHeight() + 1) {
+                getImage(src.substring(src.indexOf(",\"ou\":\"") + 7, src.indexOf("\",\"ow\":")), image);
+            } else {
+                log.logString(String.format("Image found on google is smaller than given one, skipping image at \"%s\"\n", image.getAbsolutePath()));
+            }
+        }
+    }
+
+    public boolean isAllSizesLink(WebElement e) {
+        return e.getText().toLowerCase().contains("all sizes");
+    }
+
+    private void wait(int timeInMs) {
+        try {
+            Thread.sleep(timeInMs);
+        } catch (InterruptedException e) {
+            log.logError(this, "", true, e);
         }
     }
 }
